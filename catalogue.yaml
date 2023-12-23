@@ -29,4 +29,38 @@
       src: /tmp/catalogue.zip
       dest: /app
       remote_src: yes     
-           
+
+  - name: install dependencies
+    ansible.builtin.command: npm install
+    args:
+      chdir: /app
+
+  - name: copy catalogue service
+    ansible.builtin.copy:
+      src: /home/centos/roboshop-ansible/catalogue.service
+      dest: /etc/systemd/system/catalogue.service   
+
+  - name: reload the service
+    ansible.builtin.systemd_service:
+      daemon_reload: true
+
+  - name: enable & start catalogue
+    ansible.builtin.service:
+      name: catalogue
+      state: started
+      enabled: yes  
+
+  - name: setup mongo repo to instal mngodb client
+    ansible.builtin.copy:
+      src: /home/centos/roboshop-ansible/mongo.repo
+      dest: /etc/yum.repos.d/mongo.repo        
+
+  - name: install mongodb shell
+    ansible.builtin.dnf:
+      name: mongodb-org-shell
+      state: present    
+
+  # - name: load schema
+  #   community.mysql.mysql_db:
+  #     name:
+  #     target: /app/schema/catalogue.js    
