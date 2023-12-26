@@ -50,17 +50,17 @@
       state: started
       enabled: yes  
 
-  - name: setup mongo repo to instal mngodb client
-    ansible.builtin.copy:
-      src: /home/centos/roboshop-ansible/mongo.repo
-      dest: /etc/yum.repos.d/mongo.repo        
+  # - name: setup mongo repo to instal mngodb client
+  #   ansible.builtin.copy:
+  #     src: /home/centos/roboshop-ansible/mongo.repo
+  #     dest: /etc/yum.repos.d/mongo.repo        
 
-  - name: install mongodb shell
-    ansible.builtin.package:
-      name: mongodb-org-shell
-      state: present    
+  # - name: install mongodb shell
+  #   ansible.builtin.package:
+  #     name: mongodb-org-shell
+  #     state: present    
 
-  # - name: load schema
-  #   community.mysql.mysql_db:
+  # - name: get the catageries count
+  #   ansible.builtin.command:
   #     name:
-  #     target: /app/schema/catalogue.js    
+  #     target: /app/schema/catalogue.js  
