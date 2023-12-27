@@ -1,56 +1,29 @@
-- name: cart
-  hosts: cart
+- name: install redis component
+  hosts: redis
   become: yes
   tasks:
-  - name: disable old nodejs and enable nodejs
-    ansible.builtin.shell: dnf module disable nodejs -y ; dnf module enable nodejs:18 -y
+  - name: install remi release
+    ansible.builtin.dnf: # check pacakge will work not
+      name: https://rpms.remirepo.net/enterprise/remi-release-8.rpm
+      state: present
+      disable_gpg_check: true
+  
+  - name: enable redis
+    ansible.builtin.command: dnf module enable redis:remi-6.2 -y
 
-  - name: Install nodejs
+  - name: install redis
     ansible.builtin.dnf:
-      name: nodejs 
+      name: redis
       state: present
 
-  - name: create roboshop user
-    ansible.builtin.user:
-      name: roboshop
+  - name: allow remote connections
+    ansible.builtin.replace:
+      path: /etc/redis/redis.conf
+      regexp: '127.0.0.1'
+      replace: '0.0.0.0'
 
-  - name: Recursively remove app directory
-    ansible.builtin.file:
-      path: /app
-      state: absent
-
-  - name: create app directory
-    ansible.builtin.file:
-      path: /app
-      state: directory
-
-  - name: download cart application
-    ansible.builtin.get_url:
-      url: https://roboshop-builds.s3.amazonaws.com/cart.zip
-      dest: /tmp
-
-  - name: extract cart application
-    ansible.builtin.unarchive:
-      src: /tmp/cart.zip
-      dest: /app
-      remote_src: yes
-
-  - name: Install dependencies
-    ansible.builtin.command: npm install
-    args:
-      chdir: /app
-
-  - name: Copy cart service
-    ansible.builtin.copy:
-      src: cart.service
-      dest: /etc/systemd/system/cart.service
-
-  - name: deamon realod and start
-    ansible.builtin.systemd_service:
-      daemon_reload: true
-
-  - name: start and enable cart
+  - name: start and enable redis
     ansible.builtin.service:
-      name: cart
+      name: redis
       state: restarted
       enabled: yes
